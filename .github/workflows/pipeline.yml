@@ -14,6 +14,7 @@ jobs:
 
   register-dataset:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -22,7 +23,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Dependencies
-        run: pip install -r tourism_project/deployment/requirements.txt
+        run: pip install -r tourism_project/requirements.txt
 
       - name: Register Dataset
         run: python tourism_project/model_building/data_register.py
@@ -37,6 +38,7 @@ jobs:
   data-prep:
     needs: register-dataset
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -45,7 +47,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Dependencies
-        run: pip install -r tourism_project/deployment/requirements.txt
+        run: pip install -r tourism_project/requirements.txt
 
       - name: Run Data Preparation
         run: python tourism_project/model_building/prep.py
@@ -64,6 +66,7 @@ jobs:
   model-traning:
     needs: data-prep
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -72,7 +75,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Dependencies
-        run: pip install -r tourism_project/deployment/requirements.txt
+        run: pip install -r tourism_project/requirements.txt
 
       - name: Download Train Test Splits
         uses: actions/download-artifact@v4
@@ -85,6 +88,8 @@ jobs:
           sleep 5
 
       - name: Model Building
+        env:
+          MLFLOW_TRACKING_URI: http://127.0.0.1:5000
         run: python tourism_project/model_building/train.py
 
       - name: Commit Trained Model
