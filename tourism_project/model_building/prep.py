@@ -1,22 +1,27 @@
 
 import pandas as pd
+from pathlib import Path
 from sklearn.model_selection import train_test_split
 
-df = pd.read_csv("/content/tourism_ml_project/data/tourism.csv")
+# Project root = tourism_project
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+RAW_PATH = PROJECT_ROOT / "data" / "tourism.csv"
+
+df = pd.read_csv(RAW_PATH)
+
 df.drop(columns=["CustomerID"], inplace=True)
 
-# NOTE: categorical columns are intentionally left as raw strings.
-# The training pipeline one-hot-encodes them, and the Streamlit app also sends
-# raw category values. Encoding them here (e.g. LabelEncoder) would make training
-# and serving use different representations, silently breaking predictions.
-
 target = "ProdTaken"
+
 X = df.drop(columns=[target])
 y = df[target]
 
-# stratify keeps the (imbalanced) purchase ratio consistent across splits
 Xtrain, Xtest, ytrain, ytest = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
+    X,
+    y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
 )
 
 Xtrain.to_csv("Xtrain.csv", index=False)
@@ -24,6 +29,8 @@ Xtest.to_csv("Xtest.csv", index=False)
 ytrain.to_csv("ytrain.csv", index=False)
 ytest.to_csv("ytest.csv", index=False)
 
-print("Data prepared: train/test splits written.")
-print("ProdTaken distribution in train:")
-print(ytrain.value_counts())
+print("Data preparation completed successfully.")
+print("Xtrain:", Xtrain.shape)
+print("Xtest:", Xtest.shape)
+print("ytrain:", ytrain.shape)
+print("ytest:", ytest.shape)
